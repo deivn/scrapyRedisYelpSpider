@@ -3,31 +3,54 @@ import scrapy
 import json
 from yelpSpider.optutil import OptUtil
 from yelpSpider.items import YelpspiderItem
+# from scrapy_redis.spiders import RedisSpider
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy_redis.spiders import RedisCrawlSpider
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 
 
-class YelpSpider(scrapy.Spider):
+class YelpSpider(RedisCrawlSpider):
     name = 'yelp'
-    allowed_domains = ['yelp.com']
-    offset = 0
-    start_urls = ['https://www.yelp.com/search?find_desc=Home%20inspectors&find_loc=New%20York%2C%20NY&start='+str(offset)]
+    redis_key = 'yelpspider:start_urls'
+    # name = 'yelp'
+    # allowed_domains = ['yelp.com']
+    # offset = 210
+    # start_urls = ['https://www.yelp.com/search?find_desc=Real%20Estate%20Appraiser&find_loc=New%20York%2C%20NY&start='+str(offset)]
 
-    def parse(self, response):
-        urls = response.xpath('//div[@class="lemon--div__373c0__1mboc businessName__373c0__1fTgn border-color--default__373c0__2oFDT"]//h3/a[contains(@href, "/biz")]/@href').extract()
-        logos = response.xpath('//div[@class="lemon--div__373c0__1mboc u-space-r2 border-color--default__373c0__2oFDT"]//a[contains(@href, "/biz/")]/img/@src').extract()
-        if not logos:
-            logos = response.xpath('//div[@class="lemon--div__373c0__1mboc on-click-container border-color--default__373c0__2oFDT"]/a[contains(@href, "/biz")]/img/@src').extract()
-        url_prefix_domain = 'https://www.yelp.com'
-        for url, logo in zip(urls, logos):
-            yield scrapy.Request(url_prefix_domain + url, callback=self.parse_item, meta={'_logo': logo})
-        if self.offset < 456*10:
-            self.offset += 10
-            yield scrapy.Request('https://www.yelp.com/search?find_desc=Home%20inspectors&find_loc=New%20York%2C%20NY&start='+ str(self.offset), callback=self.parse)
+    list_page = LinkExtractor(allow=r"^https://www.yelp.com/search\?find_desc=.+")
+    page_link = LinkExtractor(allow=r"^https://www.yelp.com/search\?find_desc=.+[&]?[&find_loc=.+]?")
+    detail = LinkExtractor(allow=r"^https://www.yelp.com/biz/\w+-.*?osq=.*")
+    rules = (
+        Rule(list_page, follow=True),
+        Rule(page_link, follow=True),
+        Rule(detail, callback='parse_item', follow=False)
+    )
+
+    def __init__(self, *args, **kwargs):
+        # Dynamically define the allowed domains list.
+        self.offset = 0
+        domain = kwargs.pop('domain', '')
+        self.allowed_domains = filter(None, domain.split(','))
+        super(YelpSpider, self).__init__(*args, **kwargs)
+
+    # def parse(self, response):
+    #     urls = response.xpath('//div[@class="lemon--div__373c0__1mboc businessName__373c0__1fTgn border-color--default__373c0__2oFDT"]//h3/a[contains(@href, "/biz")]/@href').extract()
+    #     logos = response.xpath('//div[@class="lemon--div__373c0__1mboc u-space-r2 border-color--default__373c0__2oFDT"]//a[contains(@href, "/biz/")]/img/@src').extract()
+    #     if not logos:
+    #         logos = response.xpath('//div[@class="lemon--div__373c0__1mboc on-click-container border-color--default__373c0__2oFDT"]/a[contains(@href, "/biz")]/img/@src').extract()
+    #     url_prefix_domain = 'https://www.yelp.com'
+    #     for url, logo in zip(urls, logos):
+    #         yield scrapy.Request(url_prefix_domain + url, callback=self.parse_item, meta={'_logo': logo})
+    #     if self.offset < 280*10:
+    #         self.offset += 10
+    #         yield scrapy.Request('https://www.yelp.com/search?find_desc=Real%20Estate%20Appraiser&find_loc=New%20York%2C%20NY&start='+ str(self.offset), callback=self.parse)
 
     def parse_item(self, response):
         item = YelpspiderItem()
         item['referer'] = response.request.headers['Referer'].decode(encoding='utf-8')
         item['detail_page_url'] = response.url
-        item['logo'] = response.meta['_logo']
+        # item['logo'] = response.meta['_logo']
         # 公司名
         item['company'] = self.get_company(response)
         item['address'] = self.get_address(response)

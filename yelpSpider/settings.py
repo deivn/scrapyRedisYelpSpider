@@ -9,28 +9,38 @@
 #     https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'yelpSpider'
+# BOT_NAME = 'yelpSpider'
 
 # 数据保存路径
-DATA_PATH_PREFIX = "D:/yelp/data"
+# DATA_PATH_PREFIX = "D:/yelp/data"
 
 SPIDER_MODULES = ['yelpSpider.spiders']
 NEWSPIDER_MODULE = 'yelpSpider.spiders'
 
-MYSQL_HOST = "184.181.11.233"
-MYSQL_PORT = 3306
-MYSQL_USER = "ebuyhouse"
-MYSQL_PASSWD = "ebuyhouse135"
-MYSQL_DB = "crawl_data"
+# MYSQL_HOST = "184.181.11.233"
+# MYSQL_PORT = 3306
+# MYSQL_USER = "ebuyhouse"
+# MYSQL_PASSWD = "ebuyhouse135"
+# MYSQL_DB = "crawl_data"
 
 
 # 默认情况下,RFPDupeFilter只记录第一个重复请求。将DUPEFILTER_DEBUG设置为True会记录所有重复的请求。
-DUPEFILTER_DEBUG = True
+# DUPEFILTER_DEBUG = True
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+SCHEDULER_PERSIST = True
+SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
+REDIS_HOST = '192.168.139.101'
+REDIS_PORT = 6379
+
+LOG_LEVEL = 'DEBUG'
 # 关掉重定向, 不会重定向到新的地址
-REDIRECT_ENABLED = False
+# REDIRECT_ENABLED = False
 # 返回301, 302时, 按正常返回对待, 可以正常写入cookie
 # HTTPERROR_ALLOWED_CODES = [301, 302]
 
@@ -41,10 +51,10 @@ REDIRECT_ENABLED = False
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 1
 # The download delay setting will honor only one of:
 # CONCURRENT_REQUESTS_PER_DOMAIN = 40
-CONCURRENT_REQUESTS_PER_IP = 16
+# CONCURRENT_REQUESTS_PER_IP = 16
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
 
@@ -81,20 +91,75 @@ USER_AGENTS = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_3) AppleWebKit/535.20 (KHTML, like Gecko) Chrome/19.0.1036.7 Safari/535.20",
     "Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52",
 ]
-USER_PASS = "wh429004:ylsvtvu1"
+# USER_PASS = "wh429004:ylsvtvu1"
 # 代理
+"""
+
+
+
+"""
 PROXIES = [
-    {'ip_port': '110.85.155.248:15363', 'user_pass': 'wh429004:ylsvtvu1'},
-    {'ip_port': '60.179.238.167:15702', 'user_pass': 'wh429004:ylsvtvu1'},
-    {'ip_port': '115.221.125.143:15197', 'user_pass': 'wh429004:ylsvtvu1'},
-    {'ip_port': '120.78.127.134:23815', 'user_pass': 'wh429004:ylsvtvu1'},
-    {'ip_port': '113.222.80.117:22873', 'user_pass': 'wh429004:ylsvtvu1'},
-    # {'ip_port': '60.179.232.197:16063', 'user_pass': 'wh429004:ylsvtvu1'},
-    # {'ip_port': '59.63.65.209:23298', 'user_pass': 'wh429004:ylsvtvu1'},
-    # {'ip_port': '220.186.144.135:23052', 'user_pass': 'wh429004:ylsvtvu1'},
-    # {'ip_port': '36.106.166.40:20278', 'user_pass': 'wh429004:ylsvtvu1'},
-    # {'ip_port': '113.221.15.101:22702', 'user_pass': 'wh429004:ylsvtvu1'},
+    {'ip_port': '121.239.88.183:22573', 'user_pass': 'wh429004:ylsvtvu1'},
+    {'ip_port': '114.220.71.205:16522', 'user_pass': 'wh429004:ylsvtvu1'},
+    # {'ip_port': '39.106.94.239:27140', 'user_pass': 'wh429004:ylsvtvu1'},
+    # {'ip_port': '125.106.217.119:18477', 'user_pass': 'wh429004:ylsvtvu1'},
+    # {'ip_port': '183.148.135.157:15300', 'user_pass': 'wh429004:ylsvtvu1'},
+    # {'ip_port': '209.141.32.12:80', 'user_pass': ''},
+    # {'ip_port': '98.143.145.29:62354', 'user_pass': ''},
+    # {'ip_port': '138.68.59.157:1210', 'user_pass': ''},
+    # {'ip_port': '159.65.184.162:9050', 'user_pass': ''},
+    # {'ip_port': '108.170.109.186:38355', 'user_pass': ''},
+    # {'ip_port': '35.228.111.162:3128', 'user_pass': ''},
+    # {'ip_port': ' 208.97.31.229:53124', 'user_pass': ''},
+    # {'ip_port': '96.44.183.149:55225', 'user_pass': ''},
+    # {'ip_port': '162.144.126.204:8133', 'user_pass': ''},
+    # {'ip_port': '174.76.35.15:1080', 'user_pass': ''},
+    # {'ip_port': '67.229.103.114:3128', 'user_pass': ''},
+    # {'ip_port': '132.145.201.21:3128', 'user_pass': ''},
+    # {'ip_port': '34.214.115.0:443', 'user_pass': ''},
+    # {'ip_port': '104.248.66.100:3128', 'user_pass': ''},
+    # {'ip_port': '40.114.109.214:3128', 'user_pass': ''},
+    # {'ip_port': '134.209.49.222:3128', 'user_pass': ''},
+    # {'ip_port': '67.205.151.211:3128', 'user_pass': ''},
+    # {'ip_port': '68.183.111.90:80', 'user_pass': ''},
+    # {'ip_port': '157.230.140.12:80', 'user_pass': ''},
+    # {'ip_port': '47.254.21.23:80', 'user_pass': ''},
+    # {'ip_port': '96.87.188.193:61748', 'user_pass': ''},
+    # {'ip_port': '162.211.126.220:443', 'user_pass': ''},
+    # {'ip_port': '52.9.244.23:3128', 'user_pass': ''},
+    # {'ip_port': '45.55.9.218:1080', 'user_pass': ''},
 ]
+# PROXIES = [
+#     {'ip_port': '97.72.175.238:87', 'user_pass': ''},
+#     {'ip_port': '108.46.171.184:43780', 'user_pass': ''},
+#     {'ip_port': '192.169.190.207:10976', 'user_pass': ''},
+#     {'ip_port': '198.199.120.102:1080', 'user_pass': ''},
+#     {'ip_port': '162.243.25.182:33379', 'user_pass': ''},
+#     {'ip_port': '209.141.32.12:80', 'user_pass': ''},
+#     {'ip_port': '98.143.145.29:62354', 'user_pass': ''},
+#     {'ip_port': '138.68.59.157:1210', 'user_pass': ''},
+#     {'ip_port': '159.65.184.162:9050', 'user_pass': ''},
+#     {'ip_port': '108.170.109.186:38355', 'user_pass': ''},
+#     {'ip_port': '35.228.111.162:3128', 'user_pass': ''},
+#     {'ip_port': ' 208.97.31.229:53124', 'user_pass': ''},
+#     {'ip_port': '96.44.183.149:55225', 'user_pass': ''},
+#     {'ip_port': '162.144.126.204:8133', 'user_pass': ''},
+#     {'ip_port': '174.76.35.15:1080', 'user_pass': ''},
+#     {'ip_port': '67.229.103.114:3128', 'user_pass': ''},
+#     {'ip_port': '132.145.201.21:3128', 'user_pass': ''},
+#     {'ip_port': '34.214.115.0:443', 'user_pass': ''},
+#     {'ip_port': '104.248.66.100:3128', 'user_pass': ''},
+#     {'ip_port': '40.114.109.214:3128', 'user_pass': ''},
+#     {'ip_port': '134.209.49.222:3128', 'user_pass': ''},
+#     {'ip_port': '67.205.151.211:3128', 'user_pass': ''},
+#     {'ip_port': '68.183.111.90:80', 'user_pass': ''},
+#     {'ip_port': '157.230.140.12:80', 'user_pass': ''},
+#     {'ip_port': '47.254.21.23:80', 'user_pass': ''},
+#     {'ip_port': '96.87.188.193:61748', 'user_pass': ''},
+#     {'ip_port': '162.211.126.220:443', 'user_pass': ''},
+#     {'ip_port': '52.9.244.23:3128', 'user_pass': ''},
+#     {'ip_port': '45.55.9.218:1080', 'user_pass': ''},
+# ]
 # 代理服务器
 # proxyServer = "http://http-dyn.abuyun.com:9020"
 # PROXY_SERVER = "http://http-dyn.abuyun.com:9020"
@@ -115,9 +180,15 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+# ITEM_PIPELINES = {
+#    'yelpSpider.pipelines.YelpspiderPipeline': 300,
+# }
+
 ITEM_PIPELINES = {
    'yelpSpider.pipelines.YelpspiderPipeline': 300,
+    'scrapy_redis.pipelines.RedisPipeline': 400,
 }
+
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html

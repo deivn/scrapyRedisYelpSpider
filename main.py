@@ -3,4 +3,4 @@
 from scrapy import cmdline
 
 
-cmdline.execute("scrapy crawl yelp".split())
+cmdline.execute("scrapy runspider E:\py_workSpace\yelpSpider\yelpSpider\spiders\yelp.py".split())

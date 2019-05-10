@@ -33,6 +33,8 @@ class YelpspiderItem(scrapy.Item):
     longitude = scrapy.Field()
     # 当前时间
     date_time = scrapy.Field()
+    crawled = scrapy.Field()
+    spider = scrapy.Field()
 
 
 
